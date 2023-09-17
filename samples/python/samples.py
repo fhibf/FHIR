@@ -7,7 +7,7 @@ aadTenant = "https://login.microsoftonline.com/"
 aadTenantId = "<tenant id>"
 
 appId = "<AAD enterprise application id>"
-appSecret = "<AAD apprivation secret/password>"
+appSecret = "<AAD application secret/password>"
 
 fhirEndpoint = "https://<workspace name>-<service name>.fhir.azurehealthcareapis.com/"
 
