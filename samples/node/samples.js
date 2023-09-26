@@ -4,8 +4,8 @@ const axios = require('axios');
 const aadTenant = 'https://login.microsoftonline.com/';
 const aadTenantId = '<tenant id>';
 
-const appId = '<AAD enterprise application id>';
-const appSecret = '<AAD application secret/password>';
+const appId = '<app id>';
+const appSecret = '<app secret>';
 
 const fhirEndpoint =
   'https://<workspace name>-<service name>.fhir.azurehealthcareapis.com/';
@@ -49,14 +49,15 @@ function printResponseResults(response) {
 
 async function getAuthToken() {
   try {
+    const data = new FormData();
+    data.append('client_id', appId);
+    data.append('client_secret', appSecret);
+    data.append('grant_type', 'client_credentials');
+    data.append('resource', fhirEndpoint);
+
     const response = await axios.post(
       aadTenant + aadTenantId + '/oauth2/token',
-      {
-        client_id: appId,
-        client_secret: appSecret,
-        grant_type: 'client_credentials',
-        resource: fhirEndpoint,
-      }
+      data
     );
     const accessToken = response.data.access_token;
     console.log(
@@ -69,7 +70,7 @@ async function getAuthToken() {
   }
 }
 
-async function postPatient(accessToken) {
+async function postPatient(accessToken, data) {
   // Example of FHIR Patient: https://www.hl7.org/fhir/patient-example.json.html
 
   const patientData = {
@@ -110,9 +111,13 @@ async function postPatient(accessToken) {
   };
 
   try {
-    const response = await axios.post(fhirEndpoint + 'Patient', patientData, {
-      headers: getHttpHeader(accessToken),
-    });
+    const response = await axios.post(
+      fhirEndpoint + 'Patient',
+      data || patientData,
+      {
+        headers: getHttpHeader(accessToken),
+      }
+    );
     const resourceId = response.data.id;
     console.log(
       '\tPatient ingested: ' + resourceId + '. HTTP ' + response.status
@@ -268,6 +273,22 @@ async function printPatientInfo(patientId, accessToken) {
       headers: getHttpHeader(accessToken),
     });
     printResponseResults(response);
+
+    return response?.data;
+  } catch (error) {
+    console.log('\tError getting patient data: ' + error.response.status);
+  }
+}
+
+async function getPatients(accessToken) {
+  const baseUrl = fhirEndpoint + 'Patient';
+
+  try {
+    const response = await axios.get(baseUrl, {
+      headers: getHttpHeader(accessToken),
+    });
+
+    return response?.data;
   } catch (error) {
     console.log('\tError getting patient data: ' + error.response.status);
   }
@@ -292,7 +313,7 @@ async function printAllAppointmentsAssignedToPatient(patientId, accessToken) {
 
 ///////////////////////////////////////////////////////////
 
-(async () => {
+const seed = async () => {
   // Step 2 - Acquire authentication token
   console.log('Acquire authentication token for secure communication.');
   const accessToken = await getAuthToken();
@@ -352,4 +373,16 @@ async function printAllAppointmentsAssignedToPatient(patientId, accessToken) {
   // Step 7 - Print all appointments assigned to a Patient
   console.log('Query all Appointments assigned to a Patient.');
   printAllAppointmentsAssignedToPatient(patientId, accessToken);
-})();
+};
+
+// Para popular os dados, descomente abaixo e execute
+// apenas uma vez
+// seed();
+
+module.exports = {
+  printPatientInfo,
+  postPatient,
+  printAllAppointmentsAssignedToPatient,
+  getAuthToken,
+  getPatients,
+};
