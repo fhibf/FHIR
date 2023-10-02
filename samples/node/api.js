@@ -13,6 +13,9 @@ const port = 3000 || process.env.PORT; // Porta em que o servidor irá escutar
 // Habilitar o middleware CORS para permitir solicitações de qualquer origem
 app.use(cors());
 
+// Habilita a possibilidade de mandar "req.body" nas APIs
+app.use(express.json());
+
 // Rota de exemplo
 app.get('/patients', async (req, res) => {
   const accessToken = await getAuthToken();

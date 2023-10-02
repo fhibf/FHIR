@@ -2,13 +2,13 @@ const axios = require('axios');
 
 // Step 1 - Define the constant values.
 const aadTenant = 'https://login.microsoftonline.com/';
-const aadTenantId = '<tenant id>';
+const aadTenantId = '2e9fb99a-c00d-421f-a9b8-38a3e34e7eb8';
 
-const appId = '<app id>';
-const appSecret = '<app secret>';
+const appId = '0766dcb9-dc09-41c3-9715-c56766311932';
+const appSecret = 'XBM8Q~_imeXhFi3OwzZUJ~Yas8ANuqSbD~BJkaZS';
 
 const fhirEndpoint =
-  'https://<workspace name>-<service name>.fhir.azurehealthcareapis.com/';
+  'https://demofhirbrznodejs-fhirservice.fhir.azurehealthcareapis.com/';
 
 ///////////////////////////////////////////////////////////
 
